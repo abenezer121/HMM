@@ -11,8 +11,8 @@ class Dijkstra:
         while queue:
             dist , node = heapq.heappop(queue)
        
-            for neighbor in graph[node]:
-                new_dist = dist + graph[node][neighbor]
+            for neighbor,weight in graph[node].items():
+                new_dist = dist + weight
 
                 if neighbor not in distance or new_dist < distance[neighbor]:
                     distance[neighbor] = new_dist
@@ -22,9 +22,14 @@ class Dijkstra:
 
                     queue.sort()
         if destinationId not in distance:
-            return 1000000000000
+            return 1000000000
         return distance[destinationId]
-        
 
 
 
+#  graph = {
+#         'A': {'B': 1, 'C': 4},
+#         'B': {'A': 1, 'C': 2, 'D': 5},
+#         'C': {'A': 4, 'B': 2, 'D': 1},
+#         'D': {'B': 5, 'C': 1}
+# }
