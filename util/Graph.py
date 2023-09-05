@@ -11,7 +11,7 @@ class Graph:
             spamreader.__next__()
             for row in spamreader:
                 if(int(row[0]) <= 1629):
-                    self.graph[int(row[0])] = {'lat' : row[1] , 'lon' : row[2]}
+                    self.graph[int(row[0])] = {'lat' : float(row[1]) , 'lon' : float(row[2])}
 
 
         with open('data/edges.csv', newline='') as csvfile:

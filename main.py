@@ -14,9 +14,7 @@ if __name__ == "__main__":
     g = Graph()
     matcher = Matcher()
     graph = g.read_graph()
-    for key , value in graph.items():
-        print(key , '()()()',value)
-    # matcher.match(graph , coordinates)
+    matcher.match(graph , coordinates)
 
 
 

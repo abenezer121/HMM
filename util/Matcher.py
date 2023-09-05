@@ -2,7 +2,7 @@ import math
 import numpy as np
 from hmm.HmmProbabilities import HmmProbabilities
 from util.Candidate import Candidate
-# from hmm.Viterbi import Viterbi
+#from hmm.Viterbi import Viterbi
 from util.CoordinateUtil import CoordinateUtil
 
 class Matcher:
@@ -12,48 +12,37 @@ class Matcher:
         hidden_states = []
 
         hmm = HmmProbabilities(4,0.93)
+        coordinateUtil = CoordinateUtil()
         for i in range(len(coordinates)):
-            nearby = CoordinateUtil.return_three_closest(coordinates[i][0], coordinates[i][1] , graph)
+            nearby = coordinateUtil.return_three_closest(coordinates[i][0], coordinates[i][1] , graph)
             inn = []
             counter = 0
+          
 
-        #     for j in range(len(nearby)):
-        #         _id = int(''.join(filter(str.isdigit, nearby[j].getId())))
-        #         near_coord = CoordinateUtil.haversine(
-        #             coordinates[i][0],
-        #             coordinates[i][1],
-        #             _id,
-        #             graph,
-        #             pg.edge
-        #         )
+            for j in range(len(nearby)):
+                _id = int(str(i)+str(j)+str(nearby[j]))
+                near_coord = [graph[nearby[j]]['lat'] , graph[nearby[j]]['lon']]
+                dist = coordinateUtil.haversine(near_coord[0], near_coord[1], coordinates[i][0], coordinates[i][1])
+                counter += 1
+                hidden_states.append(_id)
+            
+                inn.append(Candidate(
+                    
+                    coordinates[i][0],
+                    coordinates[i][1],
+                    near_coord[0],
+                    near_coord[1],
+                    hmm.emission_probability(near_coord[0], near_coord[1], coordinates[i][0], coordinates[i][1]),
+                    _id,
+                ))
 
-        #         dist = CoordinateUtil.haversine(near_coord[0], near_coord[1], coordinates[i][0], coordinates[i][1])
+            if counter == 0:
+                raise Exception("Invalid inputs")
 
-        #         if dist > 200:
-        #             continue
+            candidates.append(inn)
 
-        #         counter += 1
-        #         hidden_states.append(''.join(filter(str.isdigit, nearby[j].getId())))
-        #         id_str = str(i)
-
-        #         inn.append(Candidate(
-        #             id_str,
-        #             coordinates[i][0],
-        #             coordinates[i][1],
-        #             int(nearby[j].getSource()),
-        #             int(nearby[j].getTarget()),
-        #             near_coord[0],
-        #             near_coord[1],
-        #             hmm.emissionProbability(near_coord[0], near_coord[1], coordinates[i][0], coordinates[i][1], 4)
-        #         ))
-
-        #     if counter == 0:
-        #         raise Exception("Invalid inputs")
-
-        #     candidates.append(inn)
-
-        # size = len(hidden_states)
-        # emission_prob = hmm.returnEmissionProbability(size, len(coordinates), candidates, coordinates)
+        size = len(hidden_states)
+        emission_prob = hmm.return_emission_probability(size, len(coordinates), candidates, coordinates)
 
         # transmission_prob = hmm.returnTransmissionProbability( size, candidates, graph)
         # initial_probability = np.full(size, 1.0 / size)

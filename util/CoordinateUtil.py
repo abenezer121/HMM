@@ -1,7 +1,7 @@
 import math
 
 class CoordinateUtil:
-    def haversine(lat1, lon1, lat2, lon2):
+    def haversine(self,lat1, lon1, lat2, lon2):
             
             earth_radius = 6371000.0 # Radius of the Earth in meters
             lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
@@ -18,7 +18,8 @@ class CoordinateUtil:
     def return_three_closest(self,lat, lon , graph):
             candidates = []
             for key , value in graph.items():
-                if self.haversine(lat , lon , value['lat'] , value['lon']) < 500 and len(candidates) < 3:
+                if self.haversine(lat , lon , float(value['lat']) , float(value['lon'])) < 500 and len(candidates) < 3:
+                      
                       candidates.append(key)
             return candidates
     

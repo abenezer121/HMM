@@ -2,6 +2,8 @@ import math
 from collections import defaultdict
 from util.CoordinateUtil import CoordinateUtil
 from util.Dijkstra import Dijkstra
+import numpy as np
+
 
 class HmmProbabilities:
     def __init__(self, sigma, beta):
@@ -9,9 +11,11 @@ class HmmProbabilities:
         self.beta = beta
         
 
-    def emission_probability(self, lat1, lon1, lat2, lon2, sigma):
-        d = self.haversine_in_m(lat1, lon1, lat2, lon2)
-        e = (1 / (math.sqrt(2 * math.pi) * sigma)) * math.exp(0.5 * ((d / sigma) ** 2))
+    def emission_probability(self, lat1, lon1, lat2, lon2):
+        coordinateUtil = CoordinateUtil()
+        d = coordinateUtil.haversine(lat1, lon1, lat2, lon2)
+        log_e = -0.5 * ((d / self.sigma) ** 2) - math.log(math.sqrt(2 * math.pi) * self.sigma)
+        e = math.exp(log_e)
         return e
 
   
@@ -34,10 +38,10 @@ class HmmProbabilities:
             for s1 in sublist:
                 for j in range(len(coordinates)):
                     if (
-                        coordinates[j][0] == s1.latitude
-                        and coordinates[j][1] == s1.longitude
+                        coordinates[j][0] == s1.get_latitude()
+                        and coordinates[j][1] == s1.get_longitude()
                     ):
-                        emission_prob[outer_emission][j] = s1.emission_prob
+                        emission_prob[outer_emission][j] = s1.get_emission_probability()
                 outer_emission += 1
         return emission_prob
 
