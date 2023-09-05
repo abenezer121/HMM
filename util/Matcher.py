@@ -48,8 +48,9 @@ class Matcher:
         initial_probability = np.full(size, 1.0 / size)
 
         viterbi = Viterbi()
-        result = viterbi.viterbi(coordinates, hidden_states, initial_probability, transmission_prob, emission_prob, graph)
+        result = viterbi.viterbi(coordinates, hidden_states, initial_probability, transmission_prob, emission_prob)
+        
 
-        return result
+        # return result
              
     
