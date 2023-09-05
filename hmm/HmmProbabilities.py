@@ -20,16 +20,8 @@ class HmmProbabilities:
 
   
 
-    def return_id(self, a, b):
-        combined = f"{a}-{b}"
-        return hash(combined)
 
-    def transmission_probability(self, graph, z1lat, z1lon, z2lat, z2lon, source, target, beta):
-        dist = CoordinateUtil.haversine(z1lat, z1lon, z2lat, z2lon)
-        dijkstra = Dijkstra()  
-        dist2 = dijkstra.dijkstra(graph, source, target)  # Implement get_distance method
-        transition_prob = (1 / beta) * math.exp(-abs(dist - dist2) / beta)
-        return transition_prob
+
 
     def return_emission_probability(self, size, coordinate_size, candidates, coordinates):
         emission_prob = [[0 for _ in range(coordinate_size)] for _ in range(size)]
@@ -44,6 +36,16 @@ class HmmProbabilities:
                         emission_prob[outer_emission][j] = s1.get_emission_probability()
                 outer_emission += 1
         return emission_prob
+    
+
+
+    def transmission_probability(self, z1lat, z1lon, z2lat, z2lon, source, target,graph):
+        coordinateUtil = CoordinateUtil()
+        dist = coordinateUtil.haversine(z1lat, z1lon, z2lat, z2lon)
+        dijkstra = Dijkstra()  
+        dist2 = dijkstra.dijkstra(graph, source, target)  # Implement get_distance method
+        transition_prob = (1 / self.beta) * math.exp(-abs(dist - dist2) / self.beta)
+        return transition_prob
 
     def return_transmission_probability(self, size, candidates, graph):
         transmission_prob = [[0 for _ in range(size)] for _ in range(size)]
@@ -53,39 +55,16 @@ class HmmProbabilities:
                 inner = 0
                 for sublist2 in candidates:
                     for s2 in sublist2:
-                        if int(s2.id) == (int(s1.id) + 1):
-                            if (
-                                s1.road_start == s2.road_start
-                                and s1.road_end == s2.road_end
-                            ):
-                                index = -1
-                                for i in range(len(graph[s1.road_start].out_edges)):
-                                    if (
-                                        self.return_vertex_num_from_edge(
-                                            pg.edge[graph[s1.road_start].out_edges[i]],
-                                            s1.road_start,
-                                        )
-                                        == s1.road_end
-                                    ):
-                                        index = graph[s1.road_start].out_edges[i]
-
-                                if index != -1:
-                                    transmission_prob[outer][inner] = pg.edge[index].weight
-                                else:
-                                    transmission_prob[outer][inner] = 0
-                            else:
-                                second = s2.road_start
-                                if s1.road_start == s2.road_start:
-                                    second = s2.road_end
+                        if int(s2.get_id()) == (int(s1.get_id()) + 1):
+                                                           
                                 transmission_prob[outer][inner] = self.transmission_probability(
                              
-                                    s1.perpendicular_latitude,
-                                    s1.perpendicular_longitude,
-                                    s2.perpendicular_latitude,
-                                    s2.perpendicular_longitude,
-                                    s1.road_start,
-                                    second,
-                                    0.259442,
+                                    s1.get_latitude(),
+                                    s1.get_longitude(),
+                                    s2.get_latitude(),
+                                    s2.get_longitude(),
+                                    s1.get_nodeid(),
+                                    s2.get_nodeid,
                                     graph,
                                 
                                 )

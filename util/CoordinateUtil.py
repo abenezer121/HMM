@@ -1,7 +1,8 @@
 import math
+import heapq
 
 class CoordinateUtil:
-    def haversine(self,lat1, lon1, lat2, lon2):
+        def haversine(self,lat1, lon1, lat2, lon2):
             
             earth_radius = 6371000.0 # Radius of the Earth in meters
             lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
@@ -14,12 +15,21 @@ class CoordinateUtil:
             distance = earth_radius * c
 
             return distance
-    # doesnt really returns closest three just returns the first three it founds
-    def return_three_closest(self,lat, lon , graph):
-            candidates = []
-            for key , value in graph.items():
-                if self.haversine(lat , lon , float(value['lat']) , float(value['lon'])) < 500 and len(candidates) < 3:
-                      
-                      candidates.append(key)
-            return candidates
+   
+        def return_three_closest(self,lat, lon , graph):
+                candidates = []
+                queue = []
+
+                for key in graph:
+                        if(len(candidates) < 3):
+                                heapq.heappush(queue, (self.haversine(lat , lon ,float(graph[key]['lat']) , float(graph[key]['lon']) ), key))
+                                
+                
+                for i in range(0,3):
+                       dist , node = heapq.heappop(queue)
+                       candidates.append(node)
+                return candidates
+    
+
+    
     
