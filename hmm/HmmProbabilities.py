@@ -9,13 +9,13 @@ class HmmProbabilities:
     def __init__(self, sigma, beta):
         self.sigma = sigma
         self.beta = beta
+        self.coordinateUtil = CoordinateUtil()
         
 
+
     def emission_probability(self, lat1, lon1, lat2, lon2):
-        coordinateUtil = CoordinateUtil()
-        d = coordinateUtil.haversine(lat1, lon1, lat2, lon2)
-        log_e = -0.5 * ((d / self.sigma) ** 2) - math.log(math.sqrt(2 * math.pi) * self.sigma)
-        e = math.exp(log_e)
+        d = self.coordinateUtil.haversine(lat1, lon1, lat2, lon2)/1000
+        e = (1 / (math.sqrt(2 * math.pi) * self.sigma)) * math.exp(0.5 * ((d / self.sigma) ** 2))
         return e
 
   
@@ -40,11 +40,11 @@ class HmmProbabilities:
 
 
     def transmission_probability(self, z1lat, z1lon, z2lat, z2lon, source, target,graph):
-        coordinateUtil = CoordinateUtil()
-        dist = coordinateUtil.haversine(z1lat, z1lon, z2lat, z2lon)
+        dist = self.coordinateUtil.haversine(z1lat, z1lon, z2lat, z2lon)
         dijkstra = Dijkstra()  
         dist2 = dijkstra.dijkstra(graph, source, target)  # Implement get_distance method
-        transition_prob = (1 / self.beta) * math.exp(-abs(dist - dist2) / self.beta)
+ 
+        transition_prob = (1 / self.beta) * np.exp(-abs(dist - dist2) / self.beta)
         return transition_prob
 
     def return_transmission_probability(self, size, candidates, graph):
@@ -56,7 +56,7 @@ class HmmProbabilities:
                 for sublist2 in candidates:
                     for s2 in sublist2:
                         if int(s2.get_id()) == (int(s1.get_id()) + 1):
-                                                           
+                                                      
                                 transmission_prob[outer][inner] = self.transmission_probability(
                              
                                     s1.get_latitude(),
@@ -64,7 +64,7 @@ class HmmProbabilities:
                                     s2.get_latitude(),
                                     s2.get_longitude(),
                                     s1.get_nodeid(),
-                                    s2.get_nodeid,
+                                    s2.get_nodeid(),
                                     graph,
                                 
                                 )
@@ -73,3 +73,6 @@ class HmmProbabilities:
                         inner += 1
                 outer += 1
         return transmission_prob
+
+
+   

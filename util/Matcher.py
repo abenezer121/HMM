@@ -13,17 +13,17 @@ class Matcher:
 
         hmm = HmmProbabilities(4,0.93)
         coordinateUtil = CoordinateUtil()
-      
+        
         for i in range(len(coordinates)):
             nearby = coordinateUtil.return_three_closest(coordinates[i][0], coordinates[i][1] , graph)
             inn = []
-            counter = 0
-          
-  
+      
+            if len(nearby) == 0:
+                raise Exception("Invalid inputs")
             for j in range(len(nearby)):
                 _id = nearby[j]
                 near_coord = [graph[nearby[j]]['lat'] , graph[nearby[j]]['lon']]
-                counter += 1
+             
                 hidden_states.append(_id)
             
                 inn.append(Candidate(
@@ -34,8 +34,7 @@ class Matcher:
                     str(i)
                 ))
 
-            if counter == 0:
-                raise Exception("Invalid inputs")
+            
 
             candidates.append(inn)
 
@@ -43,12 +42,12 @@ class Matcher:
         emission_prob = hmm.return_emission_probability(size, len(coordinates), candidates, coordinates)
         transmission_prob = hmm.return_transmission_probability( size, candidates, graph)
 
- 
+
        
         initial_probability = np.full(size, 1.0 / size)
 
         viterbi = Viterbi()
-        result = viterbi.viterbi(coordinates, hidden_states, initial_probability, transmission_prob, emission_prob)
+        return viterbi.viterbi(coordinates, hidden_states, initial_probability, transmission_prob, emission_prob)
         
 
         # return result
